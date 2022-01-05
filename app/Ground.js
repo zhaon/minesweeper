@@ -2,8 +2,9 @@ import Block from './Block.js';
 import StatusEnum from './StatusEnum.js';
 
 class Ground {
+
     constructor(rows, cols, minesCount) {
-        let mines = this.generatorMines(rows * cols, minesCount);
+        let mines = this._generatorMines(rows * cols, minesCount);
         let index = 0;
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
@@ -12,9 +13,10 @@ class Ground {
             }
         }
     }
+
     _blocks = [];
 
-    generatorMines(blockCount, minesCount) {
+    _generatorMines(blockCount, minesCount) {
         let mines = [];
         for (let i = 0; i < minesCount; i++) {
             let num = parseInt(Math.random() * blockCount);
@@ -24,6 +26,21 @@ class Ground {
             mines.push(num);
         }
         return mines;
+    }
+
+    _findNearbyMineCount(x, y) {
+        let minesCount = 0;
+        for (let i = x - 1; i <= x + 1; i++) {
+            for (let j = y - 1; j <= y + 1; j++) {
+                if (i >= 0 && j >= 0) {
+                    let nearbyBlock = this.getBlock(i, j);
+                    if (nearbyBlock.hasMine()) {
+                        minesCount++;
+                    }
+                }
+            }
+        }
+        return minesCount;
     }
 
     getBlock(x, y) {
@@ -38,34 +55,41 @@ class Ground {
 
     open(x, y) {
         let block = this.getBlock(x, y);
-        let position = block.getPosition();
-        if (block.getStatus() !== StatusEnum.closed) {
-            return;
+        if (block.hasMine()) {
+            console.log('Game over!')
+            return false;
         }
-        let minesCount = 0;
-        for (let x = position.x - 1; x <= position.x + 1; x++) {
-            for (let y = position.y - 1; y <= position.y + 1; y++) {
-                if (x >= 0 && y >= 0) {
-                    let nearbyBlock = this.getBlock(x, y);
-                    if (nearbyBlock.hasMine()) {
-                        minesCount++;
+        let position = block.getPosition();
+        let minesCount = this._findNearbyMineCount(position.x, position.y);
+        block.open(minesCount);
+
+        if (minesCount === 0) {
+            for (let x1 = (position.x - 1); x1 <= (position.x + 1); x1++) {
+                for (let y1 = (position.y - 1); y1 <= (position.y + 1); y1++) {
+                    if (x1 >= 0 && y1 >= 0) {
+                        let block = this.getBlock(x1, y1);
+                        if (block.hasMine()) {
+                            continue;
+                        }
+                        if (block.getStatus() !== StatusEnum.closed) {
+                            continue
+                        }
+
+                        let minesCount = this._findNearbyMineCount(x1, y1);
+                        if (minesCount === 0) {
+                            this.open(x1, y1);
+                        }
+                        else {
+                            block.open(minesCount);
+                        }
+
                     }
+
                 }
             }
         }
 
-        if (minesCount === 0) {
-            for (let x1 = position.x - 1; x1 <= position.x + 1; x1++) {
-                for (let y1 = position.y - 1; y1 <= position.y + 1; y1++) {
-                    if (x1 >= 0 && y1 >= 0) {
-                        if (x1 !== x && y1 !== y) { // except self
-                            this.open(x1, y1);
-                        }
-                    }
-                }
-            }
-        }
-        return block.open(minesCount);
+        return true;
     }
 
     mark(x, y) {
@@ -77,6 +101,7 @@ class Ground {
         let block = this._getBlock(x, y);
         block.doubt();
     }
+
 }
 
 export default Ground;

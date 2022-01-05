@@ -30,35 +30,17 @@ class Block {
     }
 
     open(mineCount) {
-        if (this._status === StatusEnum.marked ||
-            this._status === StatusEnum.opened) {
-            return true;
-        }
-        if (this._hasMine) {
-            return false; // game over!
-        }
-        else {
+        if (this._status === StatusEnum.closed) {
             this._status = StatusEnum.opened;
             this._mineCount = mineCount;
-            return true;
         }
     }
 
     mark() {
-        if (this._status !== StatusEnum.opened) {
-            this._status = StatusEnum.marked;
-            return true;
-        }
-        return false;
 
     }
 
     doubt() {
-        if (this._status !== StatusEnum.opened) {
-            this._status = StatusEnum.doubt;
-            return true;
-        }
-        return false;
 
     }
 

@@ -3,7 +3,11 @@ import StatusEnum from './StatusEnum.js';
 
 class Ground {
 
-    constructor(rows, cols, minesCount) {
+    constructor(rows = 9, cols = 9, minesCount = 10) {
+        this._rows = rows;
+        this._cols = cols;
+        this._minesCount = minesCount;
+
         let mines = this._generatorMines(rows * cols, minesCount);
         let index = 0;
         for (let r = 0; r < rows; r++) {
@@ -14,7 +18,13 @@ class Ground {
         }
     }
 
+    _rows = 0;
+    _cols = 0;
+    _minesCount = 0;
+
     _blocks = [];
+    _helpMsg = ['open', 'mark', 'unmark', 'clear', 'restart', 'help'];
+    _isShowHelpMsg = false;
 
     _generatorMines(blockCount, minesCount) {
         let mines = [];
@@ -43,6 +53,18 @@ class Ground {
         return minesCount;
     }
 
+    getRows() {
+        return this._rows;
+    }
+
+    getCols() {
+        return this._cols;
+    }
+
+    getMinesCount() {
+        return this._minesCount;
+    }
+
     getBlock(x, y) {
         for (let block of this._blocks) {
             let position = block.getPosition();
@@ -50,56 +72,89 @@ class Ground {
                 return block;
             }
         }
-        return this._blocks[0];
+        return null;
+    }
+
+    isLost() {
+        let isLost = false;
+        for (let block of this._blocks) {
+            if (block.hasMine() && block.getStatus() === StatusEnum.opened) {
+                isLost = true;
+                break;
+            }
+        }
+        return isLost;
+    }
+
+    isWin() {
+        let isWin = true;
+        for (let block of this._blocks) {
+            if (!block.hasMine()) {
+                if (block.getStatus() === StatusEnum.closed) {
+                    isWin = false;
+                }
+            }
+        }
+        return isWin;
     }
 
     open(x, y) {
         let block = this.getBlock(x, y);
-        if (block.hasMine()) {
-            console.log('Game over!')
-            return false;
+        if (!block || block.getStatus() !== StatusEnum.closed) {
+            return;
         }
-        let position = block.getPosition();
-        let minesCount = this._findNearbyMineCount(position.x, position.y);
-        block.open(minesCount);
 
-        if (minesCount === 0) {
-            for (let x1 = (position.x - 1); x1 <= (position.x + 1); x1++) {
-                for (let y1 = (position.y - 1); y1 <= (position.y + 1); y1++) {
+        let nearbyMines = this._findNearbyMineCount(x, y);
+        block.open(nearbyMines);
+
+        if (nearbyMines === 0) {
+            for (let x1 = (x - 1); x1 <= (x + 1); x1++) {
+                for (let y1 = (y - 1); y1 <= (y + 1); y1++) {
                     if (x1 >= 0 && y1 >= 0) {
-                        let block = this.getBlock(x1, y1);
-                        if (block.hasMine()) {
-                            continue;
-                        }
-                        if (block.getStatus() !== StatusEnum.closed) {
+                        let nearbyBlock = this.getBlock(x1, y1);
+                        if (nearbyBlock.getStatus() !== StatusEnum.closed) {
                             continue
                         }
 
-                        let minesCount = this._findNearbyMineCount(x1, y1);
-                        if (minesCount === 0) {
+                        let nearbyMines = this._findNearbyMineCount(x1, y1);
+                        if (nearbyMines === 0) {
                             this.open(x1, y1);
                         }
                         else {
-                            block.open(minesCount);
+                            nearbyBlock.open(nearbyMines);
                         }
-
                     }
-
                 }
             }
         }
-
-        return true;
     }
 
     mark(x, y) {
-        let block = this._getBlock(x, y);
+        let block = this.getBlock(x, y);
         block.mark();
     }
 
+    unmark(x, y) {
+        let block = this.getBlock(x, y);
+        block.unmark();
+    }
+
     doubt(x, y) {
-        let block = this._getBlock(x, y);
+        let block = this.getBlock(x, y);
         block.doubt();
+    }
+
+    isShowHelpMsg(state) {
+        this._isShowHelpMsg = state ? true : false;
+    }
+
+    getHelpMsg() {
+        if (this._isShowHelpMsg) {
+            this._isShowHelpMsg = false;
+            return this._helpMsg;
+        }
+        return '';
+
     }
 
 }

@@ -8,7 +8,7 @@
             "type": "node-terminal",
             "name": "Debug",
             "request": "launch",
-            "command": "supervisor app/index.js",
+            "command": "supervisor app/main.js",
             "cwd": "${workspaceFolder}"
         }
     ]

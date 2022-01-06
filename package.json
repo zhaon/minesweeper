@@ -5,8 +5,11 @@
   "description": "'saolei game'",
   "main": "index.js",
   "scripts": {
-    "test": "node ./app/index.js"
+    "start": "node ./app/main.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.0.0"
+  }
 }

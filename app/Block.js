@@ -37,7 +37,15 @@ class Block {
     }
 
     mark() {
+        if (this._status === StatusEnum.closed) {
+            this._status = StatusEnum.marked;
+        }
+    }
 
+    unmark() {
+        if (this._status === StatusEnum.marked) {
+            this._status = StatusEnum.closed;
+        }
     }
 
     doubt() {

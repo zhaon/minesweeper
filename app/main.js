@@ -20,12 +20,15 @@ while (true) {
         }
         switch (arr[0]) {
             case 'open':
+            case 'o':
                 ground.open(x, y);
                 break;
             case 'mark':
+            case 'm':
                 ground.mark(x, y);
                 break;
             case 'unmark':
+            case 'u':
                 ground.unmark(x, y);
                 break;
             case 'clear':

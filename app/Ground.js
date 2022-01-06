@@ -42,7 +42,7 @@ class Ground {
         let minesCount = 0;
         for (let i = x - 1; i <= x + 1; i++) {
             for (let j = y - 1; j <= y + 1; j++) {
-                if (i >= 0 && j >= 0) {
+                if (i >= 0 && j >= 0 && i < this._cols && j < this._rows) {
                     let nearbyBlock = this.getBlock(i, j);
                     if (nearbyBlock.hasMine()) {
                         minesCount++;
@@ -110,7 +110,7 @@ class Ground {
         if (nearbyMines === 0) {
             for (let x1 = (x - 1); x1 <= (x + 1); x1++) {
                 for (let y1 = (y - 1); y1 <= (y + 1); y1++) {
-                    if (x1 >= 0 && y1 >= 0) {
+                    if (x1 >= 0 && y1 >= 0 && x1 < this._cols && y1 < this._rows) {
                         let nearbyBlock = this.getBlock(x1, y1);
                         if (nearbyBlock.getStatus() !== StatusEnum.closed) {
                             continue

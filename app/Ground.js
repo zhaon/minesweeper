@@ -9,6 +9,7 @@ class Ground {
         this._minesCount = minesCount;
 
         let mines = this._generatorMines(rows * cols, minesCount);
+
         let index = 0;
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
@@ -53,6 +54,21 @@ class Ground {
         return minesCount;
     }
 
+    _findNearbyMarkCount(x, y) {
+        let markedCount = 0;
+        for (let i = x - 1; i <= x + 1; i++) {
+            for (let j = y - 1; j <= y + 1; j++) {
+                if (i >= 0 && j >= 0 && i < this._cols && j < this._rows) {
+                    let nearbyBlock = this.getBlock(i, j);
+                    if (nearbyBlock.getStatus() === StatusEnum.marked) {
+                        markedCount++;
+                    }
+                }
+            }
+        }
+        return markedCount;
+    }
+
     getRows() {
         return this._rows;
     }
@@ -90,7 +106,7 @@ class Ground {
         let isWin = true;
         for (let block of this._blocks) {
             if (!block.hasMine()) {
-                if (block.getStatus() === StatusEnum.closed) {
+                if (block.getStatus() !== StatusEnum.opened) {
                     isWin = false;
                 }
             }
@@ -137,6 +153,33 @@ class Ground {
     unmark(x, y) {
         let block = this.getBlock(x, y);
         block.unmark();
+    }
+
+    check(x, y) {
+        let block = this.getBlock(x, y);
+        let nearbyMarkedCount = this._findNearbyMarkCount(x, y);
+
+        for (let x1 = (x - 1); x1 <= (x + 1); x1++) {
+            for (let y1 = (y - 1); y1 <= (y + 1); y1++) {
+                if (x1 >= 0 && y1 >= 0 && x1 < this._cols && y1 < this._rows) {
+                    if (x1 === x && y1 === y) {
+                        continue;
+                    }
+
+                    let nearbyBlock = this.getBlock(x1, y1);
+                    if (nearbyBlock.getStatus() !== StatusEnum.closed) {
+                        continue
+                    }
+
+                    if (block.getStatus() === StatusEnum.opened && nearbyMarkedCount === block.getMineCount()) {
+                        this.open(x1, y1);
+                    }
+                    else {
+                        nearbyBlock.check();
+                    }
+                }
+            }
+        }
     }
 
     doubt(x, y) {

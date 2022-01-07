@@ -21,56 +21,85 @@ class View {
         console.clear();
         if (ground.isLost()) {
             for (let y = 0; y < ground.getRows(); y++) {
-                let line = [];
-                for (let x = 0; x < ground.getCols(); x++) {
-                    let block = ground.getBlock(x, y);
-                    line.push(block.hasMine() ? chalk.gray('{') + chalk.gray(x + ',' + y) + ':' + chalk.red('[') + chalk.red.bold(' * ') + chalk.red(']') + chalk.gray('}') : chalk.gray('{') + chalk.gray(x + ',' + y) + ':' + chalk.red('[   ]') + chalk.gray('}'));
-                }
-                console.log(line.join(' ') + '\n');
-            }
-            console.log(chalk.bgRed(chalk.white('You lost,game over!')));
-        }
-        else if (ground.isWin()) {
-            for (let y = 0; y < ground.getRows(); y++) {
-                let line = [];
+                let lines = [];
                 for (let x = 0; x < ground.getCols(); x++) {
                     let block = ground.getBlock(x, y);
                     switch (block.getStatus()) {
                         case StatusEnum.closed:
-                            line.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgRgb(153, 153, 153)('   ') + chalk.red(']') + chalk.gray('}'));
+                            let line = chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgRgb(153, 153, 153)('   ') + chalk.red(']') + chalk.gray('}');
+                            if (block.hasMine()) {
+                                line = chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.red.bold(' * ') + chalk.red(']') + chalk.gray('}');
+                            }
+                            lines.push(line);
                             break;
                         case StatusEnum.opened:
-                            line.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + this._getColorByMineCount(block.getMineCount()) + chalk.red(']') + chalk.gray('}'));
+                            if (block.isExplode()) {
+                                lines.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgRed(chalk.white('*!!')) + chalk.red(']') + chalk.gray('}'));
+                            }
+                            else {
+                                lines.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + this._getColorByMineCount(block.getMineCount()) + chalk.red(']') + chalk.gray('}'));
+                            }
                             break;
                         case StatusEnum.marked:
-                            line.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgRgb(153, 153, 153).red.bold(' M ') + chalk.red(']') + chalk.gray('}'));
-                            break;
-                    }
-                }
-                console.log(line.join(' ') + '\n');
-            }
-            console.log(chalk.bgGreen(chalk.white('congratulations,you win!')));
-        }
-        else {
-            for (let y = 0; y < ground.getRows(); y++) {
-                let line = [];
-                for (let x = 0; x < ground.getCols(); x++) {
-                    let block = ground.getBlock(x, y);
-                    switch (block.getStatus()) {
-                        case StatusEnum.closed:
-                            line.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgRgb(153, 153, 153)('   ') + chalk.red(']') + chalk.gray('}'));
-                            break;
-                        case StatusEnum.opened:
-                            line.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + this._getColorByMineCount(block.getMineCount()) + chalk.red(']') + chalk.gray('}'));
-                            break;
-                        case StatusEnum.marked:
-                            line.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgRgb(153, 153, 153).red.bold(' M ') + chalk.red(']') + chalk.gray('}'));
+                            if (block.hasMine()) {
+                                lines.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgGreen.white.bold(' M ') + chalk.red(']') + chalk.gray('}'));
+                            }
+                            else {
+                                lines.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgRed.white.bold(' M ') + chalk.red(']') + chalk.gray('}'));
+                            }
                             break;
                         case StatusEnum.doubt:
                             break;
                     }
                 }
-                console.log(line.join(' ') + '\n');
+                console.log(lines.join(' ') + '\n');
+            }
+            console.log(chalk(chalk.red('You lost,game over!')));
+        }
+        else if (ground.isWin()) {
+            for (let y = 0; y < ground.getRows(); y++) {
+                let lines = [];
+                for (let x = 0; x < ground.getCols(); x++) {
+                    let block = ground.getBlock(x, y);
+                    switch (block.getStatus()) {
+                        case StatusEnum.opened:
+                            lines.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + this._getColorByMineCount(block.getMineCount()) + chalk.red(']') + chalk.gray('}'));
+                            break;
+                        case StatusEnum.closed:
+                        case StatusEnum.marked:
+                            lines.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgGreen.white.bold(' M ') + chalk.red(']') + chalk.gray('}'));
+                            break;
+                    }
+                }
+                console.log(lines.join(' ') + '\n');
+            }
+            console.log(chalk(chalk.green('congratulations,you win!')));
+        }
+        else {
+            for (let y = 0; y < ground.getRows(); y++) {
+                let lines = [];
+                for (let x = 0; x < ground.getCols(); x++) {
+                    let block = ground.getBlock(x, y);
+                    switch (block.getStatus()) {
+                        case StatusEnum.closed:
+                            let line = chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgRgb(153, 153, 153)('   ') + chalk.red(']') + chalk.gray('}');
+                            if (block.isCheck()) {
+                                line = chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgYellow('   ') + chalk.red(']') + chalk.gray('}');
+                                block.resetCheck();
+                            }
+                            lines.push(line);
+                            break;
+                        case StatusEnum.opened:
+                            lines.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + this._getColorByMineCount(block.getMineCount()) + chalk.red(']') + chalk.gray('}'));
+                            break;
+                        case StatusEnum.marked:
+                            lines.push(chalk.gray('{') + chalk.gray(x + ',' + y + ':') + chalk.red('[') + chalk.bgGreen.white.bold(' M ') + chalk.red(']') + chalk.gray('}'));
+                            break;
+                        case StatusEnum.doubt:
+                            break;
+                    }
+                }
+                console.log(lines.join(' ') + '\n');
             }
         }
         console.log(ground.getHelpMsg());

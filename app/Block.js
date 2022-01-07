@@ -12,6 +12,7 @@ class Block {
     _mineCount = 0;
     _hasMine = false;
     _status = StatusEnum.closed;
+    _isCheck = false;
 
     getPosition() {
         return this._position;
@@ -19,6 +20,14 @@ class Block {
 
     getStatus() {
         return this._status;
+    }
+
+    isCheck() {
+        return this._isCheck;
+    }
+
+    resetCheck() {
+        this._isCheck = false;
     }
 
     hasMine() {
@@ -49,7 +58,17 @@ class Block {
     }
 
     doubt() {
-        
+
+    }
+
+    check() {
+        if (this._status === StatusEnum.closed) {
+            this._isCheck = true;
+        }
+    }
+
+    isExplode() {
+        return this._hasMine && this._status === StatusEnum.opened;
     }
 
 }

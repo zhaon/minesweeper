@@ -31,6 +31,10 @@ while (true) {
             case 'u':
                 ground.unmark(x, y);
                 break;
+            case 'check':
+            case 'c':
+                ground.check(x, y);
+                break;
             case 'clear':
                 break;
             case 'restart':

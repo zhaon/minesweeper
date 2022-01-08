@@ -24,7 +24,7 @@ class Ground {
     _minesCount = 0;
 
     _blocks = [];
-    _helpMsg = ['open', 'mark', 'unmark', 'clear', 'restart', 'help'];
+    _helpMsg = ['open x y', 'mark x y', 'unmark x y', 'check x y', 'quit', 'restart', 'help'];
     _isShowHelpMsg = false;
 
     _generatorMines(blockCount, minesCount) {

@@ -40,10 +40,13 @@ while (true) {
             case 'restart':
                 ground = new Ground(x ? x : 9, y ? y : 9, z ? z : 10);
                 break;
+            case 'quit':
+            case 'q':
+                console.log('Bye!');
+                process.exit(0);
             case 'help':
                 ground.isShowHelpMsg(true);
                 break;
         }
     }
 }
-

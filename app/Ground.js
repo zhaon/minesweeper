@@ -147,12 +147,12 @@ class Ground {
 
     mark(x, y) {
         let block = this.getBlock(x, y);
-        block.mark();
+         block && block.mark();
     }
 
     unmark(x, y) {
         let block = this.getBlock(x, y);
-        block.unmark();
+        block && block.unmark();
     }
 
     check(x, y) {
@@ -184,7 +184,7 @@ class Ground {
 
     doubt(x, y) {
         let block = this.getBlock(x, y);
-        block.doubt();
+        block && block.doubt();
     }
 
     isShowHelpMsg(state) {
